@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if ! command -v pandoc &> /dev/null; then
+    echo "Please install pandoc in order to convert to PDF."
+    exit 1
+fi
+
+if ! command -v wkhtmltopdf &> /dev/null; then
+    echo "Please install wkhtmltopdf in order to convert to PDF."
+    exit 1
+fi
+
+if [ -z "$1" ]; then
+    echo USAGE: topdf INPUT_FILE [pandoc options]
+    exit 1
+fi
+
+# determine output filename from input file
+IN_FILE=$1
+FILENAME=$(basename -- "$IN_FILE")
+OUT_FILE="${FILENAME%.*}".pdf
+
+# default to Github-flavored markdown for markdown
+if [ "$IN_FILE" = *.md ]; then
+    USE_GFM="--from=gfm"
+fi
+
+# use style.css if present
+if [ -f "style.css" ]; then
+    CSS="--css=style.css"
+fi
+
+# use the rest of the arguments as extra options to pandoc
+shift
+EXTRA_OPTIONS="$@"
+
+echo Converting "$IN_FILE" to "$OUT_FILE"...
+
+pandoc -s --pdf-engine=wkhtmltopdf $USE_GFM $CSS -V margin-left:1in -V margin-right:1in -V margin-top:1in -V margin-bottom:1in -V papersize:letter -o "$OUT_FILE" $EXTRA_OPTIONS "$IN_FILE"
+

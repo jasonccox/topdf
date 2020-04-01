@@ -1,0 +1,46 @@
+body {
+    font-size: 14pt; /* about equivalent to 12 in Word, LibreOffice, etc. */
+    font-family: Cambria, Cochin, Georgia, 'Times New Roman', serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+h1, h2, h3 {
+    font-size: unset;
+    font-weight: normal;
+    margin-top: 2em;
+}
+
+h2 {
+    font-variant: small-caps;
+}
+
+h3 {
+    font-style: italic;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+h2 + h3 {
+    margin-top: 0;
+}
+
+h3::after {
+    content: "."
+}
+
+h3 + p {
+    display: inline;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+    line-height: 2.5em; /* about equivalent to double-spaced */
+}
+
+h1 + p, p + p {
+    text-indent: 0.5in;
+}
