@@ -11,7 +11,7 @@ if ! command -v wkhtmltopdf &> /dev/null; then
 fi
 
 if [ -z "$1" ]; then
-    echo USAGE: topdf INPUT_FILE [pandoc options]
+    echo USAGE: topdf INPUT_FILE [PANDOC_OPTIONS...]
     exit 1
 fi
 
