@@ -1,40 +1,81 @@
 #!/bin/bash
 
+usage() {
+    echo 'USAGE'
+    echo '    topdf [OPTIONS] INPUT_FILE -- [PANDOC_OPTIONS...]'
+    echo
+    echo 'OPTIONS'
+    echo '    --html   Use wkhtmltopdf as the PDF engine'
+    echo '    --latex  Use pdflatex as the PDF engine'
+}
+
 if ! command -v pandoc &> /dev/null; then
     echo "Please install pandoc in order to convert to PDF."
     exit 1
 fi
 
-if ! command -v wkhtmltopdf &> /dev/null; then
-    echo "Please install wkhtmltopdf in order to convert to PDF."
-    exit 1
-fi
+in_file=
+pdf_engine=
+pandoc_options=
 
-if [ -z "$1" ]; then
-    echo USAGE: topdf INPUT_FILE [PANDOC_OPTIONS...]
+while [ -n "$1" ]; do
+    case "$1" in
+        --html )
+            pdf_engine='wkhtmltopdf'
+            ;;
+        --latex )
+            pdf_engine='pdflatex'
+            ;;
+        -- )
+            shift
+            pandoc_options="$@"
+            break
+            ;;
+        * )
+            if [ -n "$in_file" ]; then
+                usage
+                exit 1
+            else
+                in_file="$1"
+            fi
+            ;;
+    esac
+
+    shift
+done
+
+if [ -z "$in_file" ]; then
+    usage
     exit 1
 fi
 
 # determine output filename from input file
-IN_FILE=$1
-FILENAME=$(basename -- "$IN_FILE")
-OUT_FILE="${FILENAME%.*}".pdf
-
-# default to Github-flavored markdown for markdown
-if [ "$IN_FILE" = "*.md" ]; then
-    USE_GFM="--from=gfm"
-fi
+filename=$(basename -- "$in_file")
+out_file="${filename%.*}".pdf
 
 # use style.css if present
 if [ -f "style.css" ]; then
-    CSS="--css=style.css"
+    pandoc_options="--css=style.css $pandoc_options"
 fi
 
-# use the rest of the arguments as extra options to pandoc
-shift
-EXTRA_OPTIONS="$@"
+# use specified PDF engine
+if [ -n "$pdf_engine" ]; then
+    if [ "$pdf_engine" = wkhtmltopdf ]; then
+        pandoc_options="--pdf-engine-opt=--enable-local-file-access $pandoc_options"
+    fi
 
-echo Converting "$IN_FILE" to "$OUT_FILE"...
+    pandoc_options="--pdf-engine=$pdf_engine $pandoc_options"
+fi
 
-pandoc -s --pdf-engine=wkhtmltopdf $USE_GFM $CSS -V margin-left:1in -V margin-right:1in -V margin-top:1in -V margin-bottom:1in -V papersize:letter -o "$OUT_FILE" $EXTRA_OPTIONS "$IN_FILE"
+echo Converting "$in_file" to "$out_file"...
+
+pandoc -s \
+    --variable=margin-left:1in \
+    --variable=margin-right:1in \
+    --variable=margin-top:1in \
+    --variable=margin-bottom:1in \
+    --variable=papersize:letter \
+    --output="$out_file" \
+    $pandoc_options \
+    "$in_file"
 

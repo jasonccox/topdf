@@ -13,8 +13,15 @@ Just download the `topdf` script and start using it! If you want to easily use i
 ## Usage
 
 ```bash
-$ topdf INPUT_FILE [PANDOC_OPTIONS...]
+$ topdf [OPTIONS] INPUT_FILE -- [PANDOC_OPTIONS...]'
 ```
+
+Options:
+
+- `--html`: Use wkhtmltopdf as the PDF engine
+- `--latex`: Use pdflatex as the PDF engine
+
+`PANDOC_OPTIONS` will be passed directly to `pandoc`.
 
 > This assumes you've added `topdf` to your path, as explained in the installation section.
 
