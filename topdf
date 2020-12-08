@@ -5,8 +5,9 @@ usage() {
     echo '    topdf [OPTIONS] INPUT_FILE -- [PANDOC_OPTIONS...]'
     echo
     echo 'OPTIONS'
-    echo '    --html   Use wkhtmltopdf as the PDF engine'
-    echo '    --latex  Use pdflatex as the PDF engine'
+    echo '    --wkhtml  Use wkhtmltopdf as the PDF engine'
+    echo '    --weasy   Use weasyprint as the PDF engine'
+    echo '    --latex   Use pdflatex as the PDF engine'
 }
 
 if ! command -v pandoc &> /dev/null; then
@@ -20,8 +21,11 @@ pandoc_options=
 
 while [ -n "$1" ]; do
     case "$1" in
-        --html )
+        --wkhtml )
             pdf_engine='wkhtmltopdf'
+            ;;
+        --weasy )
+            pdf_engine='weasyprint'
             ;;
         --latex )
             pdf_engine='pdflatex'
@@ -69,7 +73,8 @@ fi
 
 echo Converting "$in_file" to "$out_file"...
 
-pandoc -s \
+pandoc \
+    --standalone \
     --variable=margin-left:1in \
     --variable=margin-right:1in \
     --variable=margin-top:1in \
