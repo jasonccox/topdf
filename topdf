@@ -71,6 +71,8 @@ if [ -n "$pdf_engine" ]; then
     pandoc_options="--pdf-engine=$pdf_engine $pandoc_options"
 fi
 
+base_css="$(dirname $(realpath "$0"))/styles/base.css"
+
 echo Converting "$in_file" to "$out_file"...
 
 pandoc \
@@ -82,5 +84,6 @@ pandoc \
     --variable=papersize:letter \
     --output="$out_file" \
     $pandoc_options \
-    "$in_file"
+    "$in_file" \
+    <(echo "<style>" && cat "$base_css" && echo "</style>")
 
